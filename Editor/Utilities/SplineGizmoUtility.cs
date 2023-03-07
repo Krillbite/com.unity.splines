@@ -13,12 +13,12 @@ namespace UnityEditor.Splines
         
 // BEGIN KRILLBITE HACKY THINGS
         [UserSetting]
-        internal static UserSetting<bool> s_GizmosSkipOptimizations = new UserSetting<bool>(PathSettings.instance, "Gizmos.SkipOptimizations", true, SettingsScope.User);
+        internal static UserSetting<bool> s_GizmosSkipBadOptimizations = new UserSetting<bool>(PathSettings.instance, "Gizmos.SkipOptimizations", true, SettingsScope.User);
         
         [UserSettingBlock("Gizmos")]
         static void GizmosSkipOptimizationsPreferences(string searchContext)
         {
-            s_GizmosSkipOptimizations.value = SettingsGUILayout.SettingsToggle("KrillHack: Skip Optimizations", s_GizmosSkipOptimizations, searchContext);
+            s_GizmosSkipBadOptimizations.value = SettingsGUILayout.SettingsToggle("KrillHack: Optimized Drawing", s_GizmosSkipBadOptimizations, searchContext);
         }
         
         [UserSetting]
@@ -82,9 +82,9 @@ namespace UnityEditor.Splines
                     // KRILLBITE HACK for Unity 2021!
                     // HandleUtility.GetHandleSize() is SO SLOW! Making this optional doubled editor perf with 100+ splines in the editor.
                     // Might not be needed in Unity 2022+
-                    var size = .1f * (s_GizmosSkipOptimizations ? HandleUtility.GetHandleSize(center) : 1.0f);
+                    var size = .1f * (!s_GizmosSkipBadOptimizations ? HandleUtility.GetHandleSize(center) : 1.0f);
                     // ORIGINAL:
-                    var size = .1f * HandleUtility.GetHandleSize(center);
+                    // var size = .1f * HandleUtility.GetHandleSize(center);
                     // END HACK
                     
                     var dir = to - from;
