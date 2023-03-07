@@ -11,6 +11,15 @@ namespace UnityEditor.Splines
     public static class SplineGizmoUtility
     {
         [UserSetting]
+        internal static UserSetting<bool> s_GizmosEnabled = new UserSetting<bool>(PathSettings.instance, "Gizmos.Enabled", true, SettingsScope.User);
+        
+        [UserSettingBlock("Gizmos")]
+        static void GizmosEnabledPreferences(string searchContext)
+        {
+            s_GizmosEnabled.value = SettingsGUILayout.SettingsToggle("Enabled", s_GizmosEnabled, searchContext);
+        }
+
+        [UserSetting]
         internal static UserSetting<Color> s_GizmosLineColor = new UserSetting<Color>(PathSettings.instance, "Gizmos.SplineColor", Color.blue, SettingsScope.User);
 
         [UserSettingBlock("Gizmos")]
@@ -18,6 +27,7 @@ namespace UnityEditor.Splines
         {
             s_GizmosLineColor.value = SettingsGUILayout.SettingsColorField("Splines Color", s_GizmosLineColor, searchContext);
         }
+        
 
         static Vector3[] s_Points;
         static Vector3 s_CameraUp;
