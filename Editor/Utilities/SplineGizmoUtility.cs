@@ -10,6 +10,17 @@ namespace UnityEditor.Splines
     /// </summary>
     public static class SplineGizmoUtility
     {
+        
+// BEGIN KRILLBITE HACKY THINGS
+        [UserSetting]
+        internal static UserSetting<bool> s_GizmosSkipOptimizations = new UserSetting<bool>(PathSettings.instance, "Gizmos.SkipOptimizations", true, SettingsScope.User);
+        
+        [UserSettingBlock("Gizmos")]
+        static void GizmosSkipOptimizationsPreferences(string searchContext)
+        {
+            s_GizmosSkipOptimizations.value = SettingsGUILayout.SettingsToggle("KrillHack: Skip Optimizations", s_GizmosSkipOptimizations, searchContext);
+        }
+        
         [UserSetting]
         internal static UserSetting<bool> s_GizmosEnabled = new UserSetting<bool>(PathSettings.instance, "Gizmos.Enabled", true, SettingsScope.User);
         
@@ -19,6 +30,8 @@ namespace UnityEditor.Splines
             s_GizmosEnabled.value = SettingsGUILayout.SettingsToggle("Enabled", s_GizmosEnabled, searchContext);
         }
 
+// END KRILLBITE HACKY THINGS
+    
         [UserSetting]
         internal static UserSetting<Color> s_GizmosLineColor = new UserSetting<Color>(PathSettings.instance, "Gizmos.SplineColor", Color.blue, SettingsScope.User);
 
@@ -65,8 +78,15 @@ namespace UnityEditor.Splines
                     var to = localToWorld.MultiplyPoint(positions[i]);
 
                     var center = ( from + to ) / 2f;
+                    
+                    // KRILLBITE HACK for Unity 2021!
+                    // HandleUtility.GetHandleSize() is SO SLOW! Making this optional doubled editor perf with 100+ splines in the editor.
+                    // Might not be needed in Unity 2022+
+                    var size = .1f * (s_GizmosSkipOptimizations ? HandleUtility.GetHandleSize(center) : 1.0f);
+                    // ORIGINAL:
                     var size = .1f * HandleUtility.GetHandleSize(center);
-
+                    // END HACK
+                    
                     var dir = to - from;
                     var delta = previousDir.magnitude == 0 ? 1f :Vector3.Dot(previousDir, dir.normalized);
                     //If the angle is too wide between 2 positions, take the previous position to draw the line
