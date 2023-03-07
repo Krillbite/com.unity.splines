@@ -39,6 +39,9 @@ namespace UnityEditor.Splines
         /// <param name="container">An object implementing the ISplineContainer interface. Usually this will be a MonoBehaviour.</param>
         public static void DrawGizmos(ISplineContainer container)
         {
+            if(!s_GizmosEnabled.value)
+                return;
+            
             var splines = container.Splines;
 
             if (splines == null)
