@@ -531,6 +531,13 @@ namespace UnityEngine.Splines
 #endif
 
             Spline.Changed += OnSplineChanged;
+
+// KRILLBITE HACK: Builds need to run OnValidate here in order to calculate max probability.
+#if UNITY_STANDALONE
+            OnValidate();
+#endif      
+// END KRILLBITE HACK
+
             UpdateInstances();
         }
 
