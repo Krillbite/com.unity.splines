@@ -11,7 +11,7 @@ namespace UnityEditor.Splines
 
         internal static void ValidateTangentSelection(SelectableKnot knot)
         {
-            if (!EditorSplineUtility.AreTangentsModifiable(knot.Mode))
+            if (!SplineUtility.AreTangentsModifiable(knot.Mode))
             {
                 SplineSelection.Remove(knot.TangentIn);
                 SplineSelection.Remove(knot.TangentOut);
@@ -19,14 +19,14 @@ namespace UnityEditor.Splines
         }
 
         internal static void HandleSelection<T>(T element, bool addLinkedKnots = true)
-            where T : struct, ISplineElement
+            where T : struct, ISelectableElement
         {
             HandleSelection(element, EditorGUI.actionKey || Event.current.modifiers == EventModifiers.Shift,
                 Event.current.modifiers == EventModifiers.Shift, addLinkedKnots);
         }
 
         internal static void HandleSelection<T>(T element, bool appendElement, bool setActive, bool addLinkedKnots = true)
-            where T : struct, ISplineElement
+            where T : struct, ISelectableElement
         {
             if (appendElement)
             {
@@ -71,7 +71,7 @@ namespace UnityEditor.Splines
             }
             else
             {
-                List<ISplineElement> newSelection = new List<ISplineElement>();
+                List<ISelectableElement> newSelection = new List<ISelectableElement>();
                 if(element is SelectableKnot knot)
                 {
                     if(addLinkedKnots)
@@ -131,7 +131,7 @@ namespace UnityEditor.Splines
         internal static bool IsSelectable(SelectableTangent tangent)
         {
             // Tangents should not be selectable if not modifiable
-            if(!EditorSplineUtility.AreTangentsModifiable(tangent.Owner.Mode))
+            if(!SplineUtility.AreTangentsModifiable(tangent.Owner.Mode))
                 return false;
 
             // For open splines, tangentIn of first knot and tangentOut of last knot should not be selectable
@@ -147,7 +147,7 @@ namespace UnityEditor.Splines
             return true;
         }
 
-        internal static bool IsSelectable(ISplineElement element)
+        internal static bool IsSelectable(ISelectableElement element)
         {
             if (element is SelectableTangent tangent)
                 return IsSelectable(tangent);

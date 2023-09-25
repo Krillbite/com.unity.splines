@@ -41,10 +41,10 @@ namespace UnityEditor.Splines
             m_SplineAnimate = target as SplineAnimate;
             if (m_SplineAnimate == null)
                 return;
-            
+
             m_SplineAnimate.Updated += OnSplineAnimateUpdated;
 
-            try { 
+            try {
                 m_TargetProperty = serializedObject.FindProperty("m_Target");
                 m_MethodProperty = serializedObject.FindProperty("m_Method");
                 m_DurationProperty = serializedObject.FindProperty("m_Duration");
@@ -69,8 +69,8 @@ namespace UnityEditor.Splines
 
             EditorApplication.update += OnEditorUpdate;
             Spline.Changed += OnSplineChange;
-            ISplineContainer.SplineAdded += OnContainerSplineSetModified;
-            ISplineContainer.SplineRemoved += OnContainerSplineSetModified;
+            SplineContainer.SplineAdded += OnContainerSplineSetModified;
+            SplineContainer.SplineRemoved += OnContainerSplineSetModified;
         }
 
         void OnDisable()
@@ -92,8 +92,8 @@ namespace UnityEditor.Splines
 
             EditorApplication.update -= OnEditorUpdate;
             Spline.Changed -= OnSplineChange;
-            ISplineContainer.SplineAdded -= OnContainerSplineSetModified;
-            ISplineContainer.SplineRemoved -= OnContainerSplineSetModified;
+            SplineContainer.SplineAdded -= OnContainerSplineSetModified;
+            SplineContainer.SplineRemoved -= OnContainerSplineSetModified;
         }
 
         void OnEditorUpdate()
@@ -101,10 +101,13 @@ namespace UnityEditor.Splines
             if (!EditorApplication.isPlaying)
             {
                 if (m_SplineAnimate.Container != null && m_SplineAnimate.IsPlaying)
+                {
                     m_SplineAnimate.Update();
+                    RefreshProgressFields();
+                }
             }
-
-            RefreshProgressFields();
+            else
+                RefreshProgressFields();
         }
 
         void OnSplineChange(Spline spline, int knotIndex, SplineModification modificationType)
@@ -119,14 +122,14 @@ namespace UnityEditor.Splines
             }
         }
 
-        void OnContainerSplineSetModified(ISplineContainer container, int spline)
+        void OnContainerSplineSetModified(SplineContainer container, int spline)
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
 
             foreach (var animate in m_Components)
             {
-                if (animate.Container == (System.Object)container)
+                if (animate.Container == container)
                     animate.RecalculateAnimationParameters();
             }
         }
@@ -155,7 +158,12 @@ namespace UnityEditor.Splines
             m_ObjectUpField.RegisterValueChangedCallback((evt) => OnObjectAxisFieldChange(evt, m_ObjectUpProperty, m_ObjectForwardProperty));
 
             var startOffsetField = m_Root.Q<PropertyField>("start-offset");
-            startOffsetField.RegisterValueChangeCallback((_) => { m_SplineAnimate.StartOffset = m_StartOffsetProperty.floatValue; });
+            startOffsetField.RegisterValueChangeCallback((_) =>
+            {
+                m_SplineAnimate.StartOffset = m_StartOffsetProperty.floatValue;
+                m_SplineAnimate.Restart(false);
+                OnElapsedTimeFieldChange(m_ElapsedTimeField.value);
+            });
 
             var playButton = m_Root.Q<Button>("play");
             playButton.clicked += OnPlayClicked;
@@ -265,6 +273,9 @@ namespace UnityEditor.Splines
 
         void OnSplineAnimateUpdated(Vector3 position, Quaternion rotation)
         {
+            if (m_SplineAnimate == null)
+                return;
+
             if (!EditorApplication.isPlaying)
             {
                 m_TransformSO.Update();

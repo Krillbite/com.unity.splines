@@ -1,7 +1,7 @@
 {
   "name": "com.unity.splines",
   "displayName": "Splines",
-  "version": "2.1.0-krillbite2",
+  "version": "2.3.0-krillbite",
   "unity": "2021.3",
   "description": "Work with curves and paths. Use the Splines package to generate objects and behaviors along paths, create trajectories, and draw shapes.",
   "dependencies": {
@@ -23,18 +23,18 @@
   ],
   "category": "Tool",
   "type": "tool",
-  "testables": [
-    "com.unity.test-framework.performance"
-  ],
   "relatedPackages": {
-    "com.unity.splines.tests": "2.1.0"
+    "com.unity.splines.tests": "2.3.0"
+  },
+  "_upm": {
+    "changelog": "### Added\n\n- Exposed public APIs for `SplineTool` and `SplineHandles`.\n- Added a method to *bake* SplineInstantiate objects in the scene so the users can modify the resulting GameObjects. \n\n### Bug Fixes\n\n- [SPLB-165] Fixed a bug that prevented actions from being retained with prefab instances that contained splines when entering playmode.\n- [SPLB-162] Fixed a bug where the start offset in `SplineAnimate` did not work in Play mode. \n- [SPLB-152] Fixed objects created from `SplineInstantiate` not inheriting static flags from parent `GameObject`.\n- [SPLB-160] Fixed potential 'look rotation vector is zero' in SplineInstantiate.\n- [SPLB-156] Fixed possible null reference exception when accessing curve length."
   },
   "upmCi": {
-    "footprint": "c8222560641fdf757ff24ef57a8d024a5937534a"
+    "footprint": "51e14af422d80cedc88c5618bdf686d3c2ea4c32"
   },
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/com.unity.splines.git",
     "type": "git",
-    "revision": "ee14b014a23ca712ba3ea0841c9da16ceed7b1f7"
+    "revision": "e55ebd39cb1707c42b1744076028d133dd92e54e"
   }
 }
